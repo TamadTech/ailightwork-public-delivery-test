@@ -1,0 +1,27 @@
+name: Fixture CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  validate:
+    name: fixture-validation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Validate dummy page
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          page = Path('index.html').read_text()
+          assert '<title>Delivery test fixture</title>' in page
+          assert '<h1>Delivery test fixture</h1>' in page
+          assert 'id="status"' in page
+          assert 'FAIL_ACCEPTANCE' not in page
+          print('Synthetic fixture checks passed')
+          PY
